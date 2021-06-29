@@ -4,19 +4,34 @@ import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.formats.common.TimestampFormat;
 import org.apache.flink.table.data.RowData;
-import org.apache.flink.table.types.logical.RowType;
+import org.apache.flink.table.types.DataType;
+import org.apache.flink.util.Collector;
 
 import java.io.IOException;
 
 public class EventJsonDeserializationSchema implements DeserializationSchema<RowData> {
 
-    public EventJsonDeserializationSchema(RowType rowType, TypeInformation<RowData> resultTypeInfo, boolean ignoreParseErrors, TimestampFormat timestampFormatOption) {
+    private TypeInformation<RowData> resultTypeInfo;
 
+    private DataType dataType;
+
+    public EventJsonDeserializationSchema(DataType dataType, TypeInformation<RowData> resultTypeInfo, boolean ignoreParseErrors, TimestampFormat timestampFormatOption) {
+        this.resultTypeInfo = resultTypeInfo;
+        this.dataType = dataType;
     }
 
     @Override
     public RowData deserialize(byte[] bytes) throws IOException {
-        return null;
+        throw new RuntimeException(
+            "Please invoke DeserializationSchema#deserialize(byte[], Collector<RowData>) instead.");
+    }
+
+    @Override
+    public void deserialize(byte[] message, Collector<RowData> out) throws IOException {
+        if (message == null || message.length == 0) {
+            return;
+        }
+
     }
 
     @Override
@@ -26,6 +41,6 @@ public class EventJsonDeserializationSchema implements DeserializationSchema<Row
 
     @Override
     public TypeInformation<RowData> getProducedType() {
-        return null;
+        return resultTypeInfo;
     }
 }
