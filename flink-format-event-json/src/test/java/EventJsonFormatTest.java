@@ -8,8 +8,9 @@ public class EventJsonFormatTest {
 
         tableEnvironment.executeSql(" " +
             " CREATE TABLE sourceTable ( " +
-            "  key varchar, " +
-            "  uid varchar " +
+            "  others STRING METADATA FROM 'value.others', " +
+            "  key STRING, " +
+            "  uid STRING " +
             " ) WITH ( " +
             "  'connector' = 'kafka', " +
             "  'topic' = 'event', " +

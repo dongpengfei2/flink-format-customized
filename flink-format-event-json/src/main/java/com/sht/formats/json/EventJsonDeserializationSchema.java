@@ -11,17 +11,20 @@ import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.RowType;
 import org.apache.flink.util.Collector;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventJsonDeserializationSchema implements DeserializationSchema<RowData> {
 
     private TypeInformation<RowData> resultTypeInfo;
-
+    private List<RowType.RowField> rowTypeFields;
     private DataType dataType;
 
     public EventJsonDeserializationSchema(DataType dataType, TypeInformation<RowData> resultTypeInfo, boolean ignoreParseErrors, TimestampFormat timestampFormatOption) {
         this.resultTypeInfo = resultTypeInfo;
         this.dataType = dataType;
+        final RowType rowType = (RowType) dataType.getLogicalType();
+        rowTypeFields = rowType.getFields();
     }
 
     @Override
@@ -36,14 +39,24 @@ public class EventJsonDeserializationSchema implements DeserializationSchema<Row
             return;
         }
         String line = new String(message);
-        final RowType rowType = (RowType) dataType.getLogicalType();
-        final List<RowType.RowField> fields = rowType.getFields();
+
         final JSONObject jsonObject = JSONObject.parseObject(line);
-        GenericRowData rowData = new GenericRowData(fields.size());
-        for (int i=0; i<fields.size(); i++) {
-            final RowType.RowField rowField = fields.get(i);
-            rowData.setField(i, new BinaryStringData(jsonObject.getString(rowField.getName())));
+        GenericRowData rowData = new GenericRowData(rowTypeFields.size() );
+        JSONObject others = new JSONObject();
+        List<String> existField = new ArrayList<>();
+        for (int i=0; i<rowTypeFields.size(); i++) {
+            final RowType.RowField rowField = rowTypeFields.get(i);
+            if (jsonObject.containsKey(rowField.getName())) {
+                existField.add(rowField.getName());
+                rowData.setField(i, new BinaryStringData(jsonObject.getString(rowField.getName())));
+            }
         }
+        for (String key : jsonObject.keySet()) {
+            if (!existField.contains(key)) {
+                others.put(key, jsonObject.get(key));
+            }
+        }
+        rowData.setField(rowTypeFields.size() - 1, new BinaryStringData(others.toJSONString()));
         out.collect(rowData);
     }
 
