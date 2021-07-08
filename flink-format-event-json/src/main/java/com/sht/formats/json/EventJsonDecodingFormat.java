@@ -10,6 +10,7 @@ import org.apache.flink.table.connector.source.DynamicTableSource;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.utils.DataTypeUtils;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class EventJsonDecodingFormat implements DecodingFormat<DeserializationSc
     public EventJsonDecodingFormat(boolean ignoreParseErrors, TimestampFormat timestampFormat) {
         this.ignoreParseErrors = ignoreParseErrors;
         this.timestampFormat = timestampFormat;
+        this.metadataKeys = Collections.emptyList();
     }
 
     @Override
@@ -71,10 +73,10 @@ public class EventJsonDecodingFormat implements DecodingFormat<DeserializationSc
 
     /** List of metadata that can be read with this format. */
     enum ReadableMetadata {
-        DATABASE(
-            "other",
+        OTHERS(
+            "others",
             DataTypes.STRING().nullable(),
-            DataTypes.FIELD("other", DataTypes.STRING()));
+            DataTypes.FIELD("others", DataTypes.STRING()));
 
         final String key;
 
