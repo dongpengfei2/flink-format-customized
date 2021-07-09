@@ -18,13 +18,11 @@ public class EventJsonDeserializationSchema implements DeserializationSchema<Row
 
     private TypeInformation<RowData> resultTypeInfo;
     private List<RowType.RowField> rowTypeFields;
-    private DataType dataType;
 
     public EventJsonDeserializationSchema(DataType dataType, TypeInformation<RowData> resultTypeInfo, boolean ignoreParseErrors, TimestampFormat timestampFormatOption) {
         this.resultTypeInfo = resultTypeInfo;
-        this.dataType = dataType;
         final RowType rowType = (RowType) dataType.getLogicalType();
-        rowTypeFields = rowType.getFields();
+        this.rowTypeFields = rowType.getFields();
     }
 
     @Override

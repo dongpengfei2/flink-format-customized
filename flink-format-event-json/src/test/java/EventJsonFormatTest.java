@@ -23,6 +23,26 @@ public class EventJsonFormatTest {
             " ) "
         );
 
-        tableEnvironment.executeSql("select * from sourceTable").print();
+        tableEnvironment.executeSql(" " +
+            " CREATE TABLE sinkTable ( " +
+            "  others STRING, " +
+            "  key STRING, " +
+            "  uid STRING " +
+            " ) WITH ( " +
+            "  'connector' = 'kafka', " +
+            "  'topic' = 'dwd_event', " +
+            "  'properties.bootstrap.servers' = '127.0.0.1:9092', " +
+            "  'properties.enable.auto.commit' = 'false', " +
+            "  'properties.session.timeout.ms' = '90000', " +
+            "  'properties.request.timeout.ms' = '325000', " +
+            "  'value.format' = 'event-json', " +
+            "  'sink.partitioner' = 'round-robin', " +
+            "  'sink.parallelism' = '4' " +
+            " ) "
+        );
+
+//        tableEnvironment.executeSql("select * from sourceTable");
+
+        tableEnvironment.executeSql("insert into sinkTable(key, uid, others) select key, uid, others from sourceTable");
     }
 }
