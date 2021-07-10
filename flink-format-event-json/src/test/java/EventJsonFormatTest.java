@@ -19,7 +19,8 @@ public class EventJsonFormatTest {
             "  'properties.session.timeout.ms' = '90000', " +
             "  'properties.request.timeout.ms' = '325000', " +
             "  'scan.startup.mode' = 'earliest-offset' , " +
-            "  'value.format' = 'event-json' " +
+            "  'value.format' = 'event-json', " +
+            "  'value.event-json.others' = 'others' " +
             " ) "
         );
 
@@ -36,6 +37,7 @@ public class EventJsonFormatTest {
             "  'properties.session.timeout.ms' = '90000', " +
             "  'properties.request.timeout.ms' = '325000', " +
             "  'value.format' = 'event-json', " +
+            "  'value.event-json.others' = 'others', " +
             "  'sink.partitioner' = 'round-robin', " +
             "  'sink.parallelism' = '4' " +
             " ) "

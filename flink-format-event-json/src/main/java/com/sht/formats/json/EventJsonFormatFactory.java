@@ -34,14 +34,15 @@ public class EventJsonFormatFactory implements DeserializationFormatFactory, Ser
         FactoryUtil.validateFactoryOptions(this, formatOptions);
         final boolean ignoreParseErrors = formatOptions.get(IGNORE_PARSE_ERRORS);
         TimestampFormat timestampFormat = JsonOptions.getTimestampFormat(formatOptions);
-
-        return new EventJsonDecodingFormat(ignoreParseErrors, timestampFormat);
+        final String others = formatOptions.getOptional(EventJsonOptions.OTHER_FIELD).orElse(null);
+        return new EventJsonDecodingFormat(ignoreParseErrors, timestampFormat, others);
     }
 
     @Override
     public EncodingFormat<SerializationSchema<RowData>> createEncodingFormat(DynamicTableFactory.Context context, ReadableConfig formatOptions) {
         FactoryUtil.validateFactoryOptions(this, formatOptions);
         TimestampFormat timestampFormat = JsonOptions.getTimestampFormat(formatOptions);
+        final String others = formatOptions.getOptional(EventJsonOptions.OTHER_FIELD).orElse(null);
 
         return new EncodingFormat<SerializationSchema<RowData>>() {
             @Override
@@ -53,7 +54,7 @@ public class EventJsonFormatFactory implements DeserializationFormatFactory, Ser
             public SerializationSchema<RowData> createRuntimeEncoder(
                 DynamicTableSink.Context context, DataType consumedDataType) {
                 final RowType rowType = (RowType) consumedDataType.getLogicalType();
-                return new EventJsonSerializationSchema(rowType, timestampFormat);
+                return new EventJsonSerializationSchema(rowType, timestampFormat, others);
             }
         };
     }
@@ -73,6 +74,7 @@ public class EventJsonFormatFactory implements DeserializationFormatFactory, Ser
         Set<ConfigOption<?>> options = new HashSet<>();
         options.add(IGNORE_PARSE_ERRORS);
         options.add(TIMESTAMP_FORMAT);
+        options.add(EventJsonOptions.OTHER_FIELD);
         return options;
     }
 }

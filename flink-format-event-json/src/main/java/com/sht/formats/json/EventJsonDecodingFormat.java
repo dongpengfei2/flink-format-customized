@@ -21,13 +21,16 @@ public class EventJsonDecodingFormat implements DecodingFormat<DeserializationSc
 
     private List<String> metadataKeys;
 
+    private final String otherField;
+
     private final boolean ignoreParseErrors;
 
     private final TimestampFormat timestampFormat;
 
-    public EventJsonDecodingFormat(boolean ignoreParseErrors, TimestampFormat timestampFormat) {
+    public EventJsonDecodingFormat(boolean ignoreParseErrors, TimestampFormat timestampFormat, String otherField) {
         this.ignoreParseErrors = ignoreParseErrors;
         this.timestampFormat = timestampFormat;
+        this.otherField = otherField;
         this.metadataKeys = Collections.emptyList();
     }
 
@@ -50,7 +53,7 @@ public class EventJsonDecodingFormat implements DecodingFormat<DeserializationSc
             DataTypeUtils.appendRowFields(physicalDataType, metadataFields);
         final TypeInformation<RowData> producedTypeInfo =
             context.createTypeInformation(producedDataType);
-        return new EventJsonDeserializationSchema(producedDataType, producedTypeInfo, ignoreParseErrors, timestampFormat);
+        return new EventJsonDeserializationSchema(producedDataType, producedTypeInfo, ignoreParseErrors, timestampFormat, otherField);
     }
 
     @Override
